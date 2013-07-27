@@ -4,8 +4,12 @@
 (require racket/runtime-path)
 
 ; Clean up output files from past runs.
-(define (cleanup fn)
-  (when (file-exists? fn) (delete-file fn)))
+(define (cleanup . fns)
+  (define (delete-files args)
+    (unless (empty? args)
+      (when (file-exists? (first args)) (delete-file (first args)))
+      (delete-files (rest args))))
+  (delete-files fns))
 
 ; Declare testdata.txt as a mandatory file for things to continue,
 ; give it a symbolic name.  Read the file.
@@ -31,3 +35,5 @@
 (cleanup "testdata3.txt")
 (with-output-to-file "testdata3.txt"
   (λ () (write-bytes ostr2)))
+
+(cleanup "testdata2.txt" "testdata3.txt")
